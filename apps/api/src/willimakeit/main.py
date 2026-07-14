@@ -1,20 +1,14 @@
 from fastapi import FastAPI
-from datetime import date
-from pydantic import BaseModel
 
-app = FastAPI(title="Will I Make It API", version="0.1.0")
+from willimakeit.routes.assessments import router as assessment_router
+from willimakeit.routes.assistant import router as assistant_router
+from willimakeit.routes.health import router as health_router
 
-class ConnectionCheckRequest(BaseModel):
-    inbound_flight: str
-    inbound_date: date
-    outbound_flight: str
-    outbound_date: date
+app = FastAPI(
+    title="Will I Make It API",
+    version="0.1.0",
+)
 
-@app.get("/health")
-async def health() -> dict[str,str]:
-  return {"status": "ok"}
-
-
-@app.post("/connections/check")
-async def check_connection(item: ConnectionCheckRequest) -> ConnectionCheckRequest:
-  return item
+app.include_router(health_router)
+app.include_router(assistant_router)
+app.include_router(assessment_router)
