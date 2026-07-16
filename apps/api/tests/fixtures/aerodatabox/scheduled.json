@@ -1,0 +1,44 @@
+[
+  {
+    "departure": {
+      "airport": {
+        "icao": "LMML",
+        "iata": "MLA",
+        "name": "Luqa Malta",
+        "shortName": "Malta",
+        "municipalityName": "Luqa",
+        "location": {
+          "lat": 35.8575,
+          "lon": 14.4775
+        },
+        "countryCode": "MT",
+        "timeZone": "Europe/Malta"
+      },
+      "scheduledTime": {
+        "utc": "2026-07-15 04:00Z",
+        "local": "2026-07-15 06:00+02:00"
+      },
+      "revisedTime": {
+        "utc": "2026-07-15 04:00Z",
+        "local": "2026-07-15 06:00+02:00"
+      },
+      "quality": ["Basic", "Live"]
+    },
+    "arrival": {
+      "airport": {
+        "name": "Paris Charles de Gaulle"
+      },
+      "quality": []
+    },
+    "lastUpdatedUtc": "2026-07-15 04:37Z",
+    "number": "QR 4818",
+    "status": "EnRoute",
+    "codeshareStatus": "Unknown",
+    "isCargo": false,
+    "airline": {
+      "name": "Qatar Airways",
+      "iata": "QR",
+      "icao": "QTR"
+    }
+  }
+]

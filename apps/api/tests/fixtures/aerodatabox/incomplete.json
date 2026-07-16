@@ -1,0 +1,25 @@
+[
+  {
+    "number": "QR 4818",
+    "departure": {
+      "airport": {
+        "icao": "LMML",
+        "iata": "MLA",
+        "name": "Luqa Malta"
+      },
+      "scheduledTime": {
+        "utc": "2026-07-15 04:00Z",
+        "local": "2026-07-15 06:00+02:00"
+      }
+    },
+    "arrival": {
+      "airport": {
+        "name": "Paris Charles de Gaulle"
+      }
+    },
+    "airline": {
+      "name": "Qatar Airways",
+      "iata": "QR"
+    }
+  }
+]
