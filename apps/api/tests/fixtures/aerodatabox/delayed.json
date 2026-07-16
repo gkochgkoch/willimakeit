@@ -1,0 +1,47 @@
+[
+  {
+    "departure": {
+      "airport": {
+        "icao": "EGLL",
+        "iata": "LHR",
+        "name": "London Heathrow Airport",
+        "timeZone": "Europe/London"
+      },
+      "scheduledTime": {
+        "utc": "2026-07-10 12:00Z",
+        "local": "2026-07-10 13:00+01:00"
+      },
+      "revisedTime": {
+        "utc": "2026-07-10 12:10Z",
+        "local": "2026-07-10 13:10+01:00"
+      },
+      "terminal": "5",
+      "gate": "C62"
+    },
+    "arrival": {
+      "airport": {
+        "icao": "KJFK",
+        "iata": "JFK",
+        "name": "John F Kennedy International Airport",
+        "timeZone": "America/New_York"
+      },
+      "scheduledTime": {
+        "utc": "2026-07-10 19:10Z",
+        "local": "2026-07-10 15:10-04:00"
+      },
+      "revisedTime": {
+        "utc": "2026-07-10 19:02Z",
+        "local": "2026-07-10 15:02-04:00"
+      },
+      "terminal": "8",
+      "gate": "14"
+    },
+    "number": "BA 117",
+    "status": "Arrived",
+    "airline": {
+      "name": "British Airways",
+      "iata": "BA",
+      "icao": "BAW"
+    }
+  }
+]
