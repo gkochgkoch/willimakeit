@@ -1,34 +1,29 @@
+from collections.abc import Awaitable, Callable
 from datetime import date
 
 from willimakeit.schemas.assistant import AssistantResponse
-from willimakeit.services.flight_service import FlightService
+
+FindFlightTool = Callable[[str, date], Awaitable[dict]]
 
 
 async def run_assistant(
     message: str,
-    flight_service: FlightService,
+    find_flight: FindFlightTool,
 ) -> AssistantResponse:
-    async def find_flight(
-        flight_number: str,
-        flight_date: date,
-    ):
-        return await flight_service.find_flight(
-            flight_number=flight_number,
-            flight_date=flight_date,
-        )
-
     result = await find_flight(
-        flight_number="QR4818",
-        flight_date=date(2026, 7, 15),
+        "QR4818",
+        date(2026, 7, 15),
     )
 
-    if result is None:
+    if not result["found"]:
         return AssistantResponse(
-            status="accepted",
-            message="Flight not found",
+            status="completed",
+            message="Flight not found.",
         )
 
+    flight = result["flight"]
+
     return AssistantResponse(
-        status="accepted",
-        message=f"Received: {message}. Result contains {result.flight_number}",
+        status="completed",
+        message=(f"Received: {message}. Found flight {flight['flight_number']}."),
     )

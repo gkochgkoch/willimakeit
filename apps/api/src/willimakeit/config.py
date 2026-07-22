@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     rapidapi_key: str = ""
     aerodatabox_base_url: str = "https://aerodatabox.p.rapidapi.com"
     aerodatabox_timeout_seconds: float = 10.0
+    ollama_base_url: str = "http://localhost:11434/v1/"
+    ollama_model: str = "qwen3:4b"
 
     model_config = SettingsConfigDict(
         env_file=API_ROOT / ".env",

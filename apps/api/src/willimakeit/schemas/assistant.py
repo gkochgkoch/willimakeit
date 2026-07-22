@@ -8,6 +8,6 @@ class AssistantRequest(BaseModel):
 
 
 class AssistantResponse(BaseModel):
-    status: Literal["accepted", "need_more_information"]
+    status: Literal["completed", "need_more_information"]
     assessment_id: str | None = None
     message: str | None = None
