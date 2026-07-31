@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     aerodatabox_timeout_seconds: float = 10.0
     ollama_base_url: str = "http://localhost:11434/v1/"
     ollama_model: str = "qwen3:4b"
+    database_url: str
 
     model_config = SettingsConfigDict(
         env_file=API_ROOT / ".env",
