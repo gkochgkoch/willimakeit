@@ -13,38 +13,39 @@ class ConnectionTool:
 
     async def assess_connection(
         self,
-        inbound_arrival: datetime,
-        outbound_departure: datetime,
+        inbound_arrival: str,
+        outbound_departure: str,
         minimum_connection_minutes: int,
         terminal_transfer_minutes: int = 0,
         security_check_minutes: int = 0,
         immigration_control_minutes: int = 0,
         disruption_buffer_minutes: int = 0,
     ) -> dict:
-        """Calculate connection feasibility and risk.
+        """Assess whether a flight connection is feasible.
 
-        Use this tool for all connection-time calculations and risk
-        classifications. Do not calculate connection risk manually.
+        Use only when arrival and departure times are known and
+        the user asks whether the connection can be made.
 
-        Args:
-            inbound_arrival:
-                Scheduled or estimated arrival time of the inbound flight.
-            outbound_departure:
-                Scheduled departure time of the onward flight.
-            minimum_connection_minutes:
-                Base minimum time required for the connection.
-            terminal_transfer_minutes:
-                Additional time needed to move between terminals.
-            security_check_minutes:
-                Additional time needed to pass security.
-            immigration_control_minutes:
-                Additional time needed for immigration or passport control.
-            disruption_buffer_minutes:
-                Additional time reserved for known disruption risk.
+        Times must use ISO-8601 format.
         """
+
+        print(
+            "CONNECTION TOOL CALLED:",
+            f"{inbound_arrival=}",
+            f"{outbound_departure=}",
+            f"{minimum_connection_minutes=}",
+            f"{terminal_transfer_minutes=}",
+            f"{security_check_minutes=}",
+            f"{immigration_control_minutes=}",
+            f"{disruption_buffer_minutes=}",
+            flush=True,
+        )
+
+        inbound_dt = datetime.fromisoformat(inbound_arrival)
+        outbound_dt = datetime.fromisoformat(outbound_departure)
         request = ConnectionAssessmentRequest(
-            inbound_arrival=inbound_arrival,
-            outbound_departure=outbound_departure,
+            inbound_arrival=inbound_dt,
+            outbound_departure=outbound_dt,
             minimum_connection_minutes=minimum_connection_minutes,
             terminal_transfer_minutes=terminal_transfer_minutes,
             security_check_minutes=security_check_minutes,
@@ -53,4 +54,13 @@ class ConnectionTool:
         )
 
         result = self._connection_service.assess(request)
-        return result.model_dump(mode="json")
+
+        tool_result = result.model_dump(mode="json")
+
+        print(
+            "CONNECTION TOOL RESULT:",
+            tool_result,
+            flush=True,
+        )
+
+        return tool_result

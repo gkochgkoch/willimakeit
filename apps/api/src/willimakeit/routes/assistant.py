@@ -16,5 +16,5 @@ async def assistant_ask(
 ) -> AssistantResponse:
     return await run_assistant(
         message=body.message,
-        find_flight=request.app.state.find_flight_tool,
+        agent=request.app.state.assistant_agent,
     )
