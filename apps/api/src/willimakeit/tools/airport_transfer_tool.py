@@ -40,7 +40,7 @@ class AirportTransferTool:
         - baggage recheck requirements
 
         Do NOT use this tool to calculate whether the passenger
-        will make the connection. Use assess_connection for that.
+        will make the connection. Use assess_flight_connection for that.
         """
 
         print(

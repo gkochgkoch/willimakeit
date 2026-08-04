@@ -13,9 +13,10 @@ from willimakeit.routes.assistant import router as assistant_router
 from willimakeit.routes.health import router as health_router
 from willimakeit.services.airport_transfer_service import AirportTransferService
 from willimakeit.services.connection_service import ConnectionService
+from willimakeit.services.flight_connection_service import FlightConnectionService
 from willimakeit.services.flight_service import FlightService
 from willimakeit.tools.airport_transfer_tool import AirportTransferTool
-from willimakeit.tools.connection_tool import ConnectionTool
+from willimakeit.tools.flight_connection_tool import FlightConnectionTool
 from willimakeit.tools.flight_tool import create_flight_tool
 
 
@@ -42,11 +43,14 @@ async def lifespan(app: FastAPI):
             flight_service=flight_service,
         )
 
-        connection_tool = ConnectionTool(
+        flight_connection_service = FlightConnectionService(
+            flight_service=flight_service,
+            airport_transfer_service=airport_transfer_service,
             connection_service=connection_service,
         )
 
         airport_transfer_tool = AirportTransferTool(service=airport_transfer_service)
+        flight_connection_tool = FlightConnectionTool(service=flight_connection_service)
 
         assistant_agent = OpenAIChatClient(
             api_key="ollama",
@@ -57,13 +61,14 @@ async def lifespan(app: FastAPI):
             instructions=CONNECTION_ASSISTANT_SYSTEM_PROMPT,
             tools=[
                 find_flight,
-                connection_tool.assess_connection,
                 airport_transfer_tool.get_airport_transfer_estimate,
+                flight_connection_tool.assess_flight_connection,
             ],
         )
 
         app.state.flight_service = flight_service
         app.state.connection_service = connection_service
+        app.state.flight_connection_service = flight_connection_service
         app.state.assistant_agent = assistant_agent
 
         yield
