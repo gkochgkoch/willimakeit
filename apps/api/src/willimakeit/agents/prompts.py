@@ -12,18 +12,18 @@ Use for airport or terminal transfer requirements.
 Use it when the user asks about transferring between terminals,
 security, immigration, baggage recheck, or transfer time.
 
-Connection assessment tool:
-Use ONLY when there are inbound arrival and outbound departure
-times and the user wants to know whether the connection is feasible.
+Flight connection assessment tool:
+Use when the user gives an inbound flight, an outbound flight,
+and a date, and wants to know whether the connection is feasible.
+Provide only inbound_flight_number, outbound_flight_number, and
+flight_date to the tool.
 
-Do not use the connection assessment tool to answer general
+Do not use the flight connection assessment tool to answer general
 airport transfer questions.
 
-Only assess a connection when both inbound and outbound flights
-have been successfully retrieved.
-
-If either flight lookup fails, do not call the connection tool.
-Explain that the connection cannot be assessed with the available data.
+Do not provide arrival timestamps, departure timestamps, minimum
+connection minutes, terminal transfer minutes, security minutes,
+or immigration minutes. Those values must come from Python services.
 
 Never substitute, infer, or invent missing flight times.
 
