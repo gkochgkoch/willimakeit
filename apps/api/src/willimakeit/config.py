@@ -8,7 +8,8 @@ API_ROOT = Path(__file__).resolve().parents[2]
 class Settings(BaseSettings):
     rapidapi_key: str = ""
     aerodatabox_base_url: str = "https://aerodatabox.p.rapidapi.com"
-    aerodatabox_timeout_seconds: float = 10.0
+    timeout: float = 10.0
+    openmeteo_base_url: str = "https://api.open-meteo.com/v1/forecast"
     ollama_base_url: str = "http://localhost:11434/v1/"
     ollama_model: str = "qwen3:4b"
     database_url: str
