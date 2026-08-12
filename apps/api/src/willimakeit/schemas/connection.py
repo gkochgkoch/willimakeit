@@ -3,6 +3,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
+from willimakeit.schemas.weather import Weather
+
 
 class ConnectionRisk(StrEnum):
     LOW = "low"
@@ -20,6 +22,11 @@ class ConnectionAssessmentRequest(BaseModel):
     security_check_minutes: int = Field(default=0, ge=0)
     immigration_control_minutes: int = Field(default=0, ge=0)
     disruption_buffer_minutes: int = Field(default=0, ge=0)
+
+
+class FlightConnectionResult(BaseModel):
+    assessment: ConnectionAssessment
+    weather: Weather | None = None
 
 
 class ConnectionAssessment(BaseModel):
