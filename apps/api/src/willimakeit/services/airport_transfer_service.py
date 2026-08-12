@@ -34,8 +34,10 @@ class AirportTransferService:
             )
 
             if rule is None:
+                airport_code = airport_code.upper()
                 raise AirportTransferRuleNotFoundError(
-                    f"no rule found {airport_code.upper()}"
+                    f"No transfer rule exists for {airport_code} "
+                    f"from terminal {arrival_terminal} to terminal {departure_terminal}"
                 )
 
             total_required_minutes = (

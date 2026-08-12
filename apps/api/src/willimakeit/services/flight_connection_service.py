@@ -1,9 +1,11 @@
+import asyncio
 from datetime import date
 
 from willimakeit.schemas.connection import (
     ConnectionAssessmentRequest,
     FlightConnectionResult,
 )
+from willimakeit.schemas.flight import FlightProviderError
 from willimakeit.services.airport_location_service import AirportLocationService
 from willimakeit.services.airport_transfer_service import AirportTransferService
 from willimakeit.services.connection_service import ConnectionService
@@ -36,22 +38,32 @@ class FlightConnectionService:
         outbound_flight_number: str,
         flight_date: date,
     ) -> FlightConnectionResult:
-        inbound = await self._flight_service.find_flight(
-            inbound_flight_number,
-            flight_date,
-        )
-        if inbound is None:
-            raise FlightConnectionError("inbound flight is not found")
+        print("FC: START", flush=True)
 
-        outbound = await self._flight_service.find_flight(
-            outbound_flight_number,
-            flight_date,
-        )
-        if outbound is None:
-            raise FlightConnectionError("outbound flight is not found")
+        try:
+            inbound, outbound = await asyncio.gather(
+                self._flight_service.find_flight(
+                    inbound_flight_number,
+                    flight_date,
+                ),
+                self._flight_service.find_flight(
+                    outbound_flight_number,
+                    flight_date,
+                ),
+            )
+
+            if inbound is None:
+                raise FlightConnectionError("inbound flight is not found")
+
+            if outbound is None:
+                raise FlightConnectionError("outbound flight is not found")
+
+        except FlightProviderError as exc:
+            raise FlightConnectionError(str(exc)) from exc
 
         arrival_airport = self._airport_code(inbound.arrival_airport.iata)
         departure_airport = self._airport_code(outbound.departure_airport.iata)
+
         if arrival_airport is None or departure_airport is None:
             raise FlightConnectionError("connection airport is missing")
 
@@ -59,6 +71,11 @@ class FlightConnectionService:
             raise FlightConnectionError(
                 "inbound arrival airport does not match outbound departure airport"
             )
+
+        print(
+            f"FC: AIRPORTS arrival={arrival_airport} departure={departure_airport}",
+            flush=True,
+        )
 
         location = await self._airport_location_service.coords(arrival_airport)
 
@@ -76,6 +93,14 @@ class FlightConnectionService:
             raise FlightConnectionError("inbound arrival terminal is missing")
         if departure_terminal is None:
             raise FlightConnectionError("outbound departure terminal is missing")
+
+        print(
+            "TRANSFER INPUT:",
+            f"airport={arrival_airport}",
+            f"arrival_terminal={arrival_terminal}",
+            f"departure_terminal={departure_terminal}",
+            flush=True,
+        )
 
         transfer = await self._airport_transfer_service.estimate_transfer(
             airport_code=arrival_airport,

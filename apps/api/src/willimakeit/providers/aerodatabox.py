@@ -4,7 +4,7 @@ from datetime import date
 import httpx
 
 from willimakeit.providers.aerodatabox_mapper import map_flight_schedule
-from willimakeit.schemas.flight import FlightSchedule
+from willimakeit.schemas.flight import FlightProviderError, FlightSchedule
 
 
 class AeroDataBoxFlightProvider:
@@ -36,16 +36,19 @@ class AeroDataBoxFlightProvider:
 
             self._last_request_at = asyncio.get_running_loop().time()
 
-            res = await self._client.get(
-                (
-                    f"{self._base_url}/flights/number/"
-                    f"{normalized_flight_number}/{flight_date.isoformat()}"
-                ),
-                headers={
-                    "X-RapidAPI-Key": self._api_key,
-                    "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com",
-                },
-            )
+            try:
+                res = await self._client.get(
+                    (
+                        f"{self._base_url}/flights/number/"
+                        f"{normalized_flight_number}/{flight_date.isoformat()}"
+                    ),
+                    headers={
+                        "X-RapidAPI-Key": self._api_key,
+                        "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com",
+                    },
+                )
+            except httpx.ReadTimeout as exc:
+                raise FlightProviderError("Flight data provider timed out") from exc
 
         if res.status_code in {204, 404}:
             return None
