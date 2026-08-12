@@ -3,6 +3,10 @@ from datetime import date, datetime
 from pydantic import BaseModel
 
 
+class FlightProviderError(Exception):
+    pass
+
+
 class Airport(BaseModel):
     icao: str | None = None
     name: str | None = None
