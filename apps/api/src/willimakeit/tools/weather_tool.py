@@ -22,27 +22,15 @@ class WeatherTool:
         airport_code: Annotated[
             str, Field(description="Airport iata code, for example LHR")
         ],
-        start_date: Annotated[
-            str, Field(description="Date of connection, we need to check only one day")
-        ],
-        end_date: Annotated[
-            str,
-            Field(
-                description="Same as start date cause we only interested"
-                " in particular date of connection"
-            ),
-        ],
+        flight_date: Annotated[str, Field(description="Date of connection")],
     ) -> dict[str, object]:
-        """Get the weather forecast for a specific airport location.
-
-        Use this tool when weather information is requested or when
-        weather conditions must be checked for a flight connection.
-
+        """Get the weather forecast for a specific airport code.
+        Use this tool when weather information is requested.
         Returns hourly weather conditions for the requested date.
         """
 
         print(
-            f"WEATHER TOOL CALLD:{airport_code=}{start_date=}{end_date=}",
+            f"WEATHER TOOL CALLED: {airport_code=} {flight_date=}",
             flush=True,
         )
 
@@ -53,15 +41,14 @@ class WeatherTool:
                 "error": f"Airport {airport_code} not found",
             }
 
-        start = date.fromisoformat(start_date)
-        end = date.fromisoformat(end_date)
+        parsed_date = date.fromisoformat(flight_date)
 
         try:
             forecast = await self.weather_service.forecast(
                 latitude=location.latitude,
                 longitude=location.longitude,
-                start_date=start,
-                end_date=end,
+                start_date=parsed_date,
+                end_date=parsed_date,
             )
         except WeatherProviderError as exc:
             return {

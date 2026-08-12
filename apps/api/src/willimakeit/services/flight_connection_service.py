@@ -1,12 +1,14 @@
 from datetime import date
 
 from willimakeit.schemas.connection import (
-    ConnectionAssessment,
     ConnectionAssessmentRequest,
+    FlightConnectionResult,
 )
+from willimakeit.services.airport_location_service import AirportLocationService
 from willimakeit.services.airport_transfer_service import AirportTransferService
 from willimakeit.services.connection_service import ConnectionService
 from willimakeit.services.flight_service import FlightService
+from willimakeit.services.weather_service import WeatherService
 
 
 class FlightConnectionError(Exception):
@@ -19,17 +21,21 @@ class FlightConnectionService:
         flight_service: FlightService,
         airport_transfer_service: AirportTransferService,
         connection_service: ConnectionService,
+        airport_location_service: AirportLocationService,
+        weather_service: WeatherService,
     ) -> None:
         self._flight_service = flight_service
         self._airport_transfer_service = airport_transfer_service
         self._connection_service = connection_service
+        self._airport_location_service = airport_location_service
+        self._weather_service = weather_service
 
     async def assess(
         self,
         inbound_flight_number: str,
         outbound_flight_number: str,
         flight_date: date,
-    ) -> ConnectionAssessment:
+    ) -> FlightConnectionResult:
         inbound = await self._flight_service.find_flight(
             inbound_flight_number,
             flight_date,
@@ -53,6 +59,11 @@ class FlightConnectionService:
             raise FlightConnectionError(
                 "inbound arrival airport does not match outbound departure airport"
             )
+
+        location = await self._airport_location_service.coords(arrival_airport)
+
+        if location is None:
+            raise FlightConnectionError(f"airport {arrival_airport} is not found")
 
         if inbound.scheduled_arrival_utc is None:
             raise FlightConnectionError("inbound scheduled arrival time is missing")
@@ -83,7 +94,27 @@ class FlightConnectionService:
             disruption_buffer_minutes=0,
         )
 
-        return self._connection_service.assess(request)
+        assessment = self._connection_service.assess(request)
+        print(
+            "WEATHER INPUT:",
+            f"airport={arrival_airport}",
+            f"date={flight_date}",
+            f"latitude={location.latitude if location else None}",
+            f"longitude={location.longitude if location else None}",
+            flush=True,
+        )
+        print(f"WEATHER AIRPORT {arrival_airport}")
+        weather = await self._weather_service.forecast(
+            latitude=location.latitude,
+            longitude=location.longitude,
+            start_date=flight_date,
+            end_date=flight_date,
+        )
+
+        return FlightConnectionResult(
+            assessment=assessment,
+            weather=weather,
+        )
 
     @staticmethod
     def _airport_code(value: str | None) -> str | None:

@@ -61,6 +61,8 @@ async def lifespan(app: FastAPI):
             flight_service=flight_service,
             airport_transfer_service=airport_transfer_service,
             connection_service=connection_service,
+            airport_location_service=airport_location_service,
+            weather_service=weather_service,
         )
 
         airport_transfer_tool = AirportTransferTool(service=airport_transfer_service)

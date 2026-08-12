@@ -51,7 +51,7 @@ class FlightConnectionTool:
 
         try:
             parsed_date = date.fromisoformat(flight_date)
-            assessment = await self._service.assess(
+            result = await self._service.assess(
                 inbound_flight_number=inbound_flight_number,
                 outbound_flight_number=outbound_flight_number,
                 flight_date=parsed_date,
@@ -77,7 +77,7 @@ class FlightConnectionTool:
 
         tool_result = {
             "assessed": True,
-            **assessment.model_dump(mode="json"),
+            **result.model_dump(mode="json"),
         }
 
         print(

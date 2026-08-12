@@ -13,15 +13,24 @@ Use it when the user asks about transferring between terminals,
 security, immigration, baggage recheck, or transfer time.
 
 Weather tool:
-When the user asks to check airport weather, ALWAYS use the weather tool.
+
+When the user explicitly asks for airport weather, ALWAYS use the weather tool.
 Do not answer from your own knowledge.
-When assessing a flight connection, use the weather tool for the
-relevant connection airport(s) before making the final assessment.
 
-Use the weather data to identify potentially disruptive conditions,
-especially heavy snowfall, poor visibility, or strong winds.
 
-Do not make the final connection assessment based on weather alone.
+Use the flight_date provided to the flight connection assessment as
+both start_date and end_date.
+
+Do not ask the user for the connection airport code.
+Do not call the flight tool separately to determine the connection airport.
+
+The weather result is an additional factor in the final connection
+assessment. Do not ignore the weather result just because the baseline
+connection risk is low.
+
+If the weather tool fails or the airport is not available in the
+airport database, state that weather could not be evaluated and
+provide the baseline connection assessment.
 
 Flight connection assessment tool:
 Use when the user gives an inbound flight, an outbound flight,
