@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import httpx
 from agent_framework.openai import OpenAIChatClient
 from fastapi import FastAPI
+from redis.asyncio import Redis
 
 from willimakeit.agents.prompts import CONNECTION_ASSISTANT_SYSTEM_PROMPT
 from willimakeit.config import settings
@@ -30,6 +31,7 @@ from willimakeit.tools.weather_tool import WeatherTool
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    redis = Redis.from_url(settings.redis_url, decode_responses=True)
     async with httpx.AsyncClient(timeout=settings.timeout) as http_client:
         weather_provider = OpenMeteoWeatherProvider(
             client=http_client, base_url=settings.openmeteo_base_url
@@ -44,6 +46,7 @@ async def lifespan(app: FastAPI):
             client=http_client,
             base_url=settings.aerodatabox_base_url,
             api_key=settings.rapidapi_key,
+            redis=redis,
         )
 
         flight_service = FlightService(
@@ -90,13 +93,16 @@ async def lifespan(app: FastAPI):
             ],
         )
 
+        app.state.redis = redis
         app.state.flight_service = flight_service
         app.state.connection_service = connection_service
         app.state.flight_connection_service = flight_connection_service
         app.state.assistant_agent = assistant_agent
         app.state.weather_service = weather_service
-
-        yield
+        try:
+            yield
+        finally:
+            await redis.aclose()
 
 
 app = FastAPI(

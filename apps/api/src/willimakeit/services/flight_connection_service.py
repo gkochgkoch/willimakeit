@@ -38,7 +38,6 @@ class FlightConnectionService:
         outbound_flight_number: str,
         flight_date: date,
     ) -> FlightConnectionResult:
-        print("FC: START", flush=True)
 
         try:
             inbound, outbound = await asyncio.gather(
@@ -64,8 +63,6 @@ class FlightConnectionService:
         except FlightProviderError as exc:
             raise FlightConnectionError(str(exc)) from exc
 
-        print("FC: AFTER FLIGHT LOOKUPS", flush=True)
-
         arrival_airport = self._airport_code(inbound.arrival_airport.iata)
         departure_airport = self._airport_code(outbound.departure_airport.iata)
 
@@ -76,11 +73,6 @@ class FlightConnectionService:
             raise FlightConnectionError(
                 "inbound arrival airport does not match outbound departure airport"
             )
-
-        print(
-            f"FC: AIRPORTS arrival={arrival_airport} departure={departure_airport}",
-            flush=True,
-        )
 
         location = await self._airport_location_service.coords(arrival_airport)
 
@@ -133,7 +125,6 @@ class FlightConnectionService:
             f"longitude={location.longitude if location else None}",
             flush=True,
         )
-        print(f"WEATHER AIRPORT {arrival_airport}")
         weather = await self._weather_service.forecast(
             latitude=location.latitude,
             longitude=location.longitude,
