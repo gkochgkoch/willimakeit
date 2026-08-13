@@ -7,6 +7,9 @@ from fastapi import FastAPI
 from willimakeit.agents.prompts import CONNECTION_ASSISTANT_SYSTEM_PROMPT
 from willimakeit.config import settings
 from willimakeit.db.session import async_session_factory
+from willimakeit.middleware.request_id import (
+    register_request_id_middleware,
+)
 from willimakeit.providers.aerodatabox import AeroDataBoxFlightProvider
 from willimakeit.providers.openmeteo import OpenMeteoWeatherProvider
 from willimakeit.routes.assessments import router as assessment_router
@@ -101,6 +104,8 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+register_request_id_middleware(app)
 
 app.include_router(health_router)
 app.include_router(assistant_router)

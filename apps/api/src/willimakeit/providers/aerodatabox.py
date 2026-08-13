@@ -3,6 +3,7 @@ from datetime import date
 
 import httpx
 
+from willimakeit.context import request_id_context
 from willimakeit.providers.aerodatabox_mapper import map_flight_schedule
 from willimakeit.schemas.flight import FlightProviderError, FlightSchedule
 
@@ -21,13 +22,12 @@ class AeroDataBoxFlightProvider:
         self._rate_limit_lock = asyncio.Lock()
         self._last_request_at = 0.0
 
-    async def find_flight(
-        self,
-        flight_number: str,
-        flight_date: date,
-    ) -> FlightSchedule | None:
-        normalized_flight_number = flight_number.replace(" ", "").upper()
-
+    async def _make_request(self, flight_number: str, flight_date: date):
+        """Aerodatabox allowes oonly one request per second"""
+        print(
+            f"PROVIDER={id(self)} flight={flight_number}",
+            flush=True,
+        )
         async with self._rate_limit_lock:
             elapsed = asyncio.get_running_loop().time() - self._last_request_at
 
@@ -36,19 +36,45 @@ class AeroDataBoxFlightProvider:
 
             self._last_request_at = asyncio.get_running_loop().time()
 
+        res = await self._client.get(
+            (
+                f"{self._base_url}/flights/number/"
+                f"{flight_number}/{flight_date.isoformat()}"
+            ),
+            headers={
+                "X-RapidAPI-Key": self._api_key,
+                "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com",
+            },
+        )
+        print(
+            f"REQUEST ID={request_id_context.get()} "
+            f"PROVIDER={id(self)} "
+            f"flight={flight_number}",
+            flush=True,
+        )
+        return res
+
+    async def find_flight(
+        self,
+        flight_number: str,
+        flight_date: date,
+    ) -> FlightSchedule | None:
+        normalized_flight_number = flight_number.replace(" ", "").upper()
+
+        attempt = 0
+        max_attempts = 2
+
+        while attempt < max_attempts:
             try:
-                res = await self._client.get(
-                    (
-                        f"{self._base_url}/flights/number/"
-                        f"{normalized_flight_number}/{flight_date.isoformat()}"
-                    ),
-                    headers={
-                        "X-RapidAPI-Key": self._api_key,
-                        "X-RapidAPI-Host": "aerodatabox.p.rapidapi.com",
-                    },
-                )
-            except httpx.ReadTimeout as exc:
-                raise FlightProviderError("Flight data provider timed out") from exc
+                res = await self._make_request(normalized_flight_number, flight_date)
+                break
+            except httpx.RequestError as exc:
+                attempt += 1
+                if attempt >= max_attempts:
+                    raise FlightProviderError(
+                        "Flight data provider request failed"
+                    ) from exc
+                await asyncio.sleep(1)
 
         if res.status_code in {204, 404}:
             return None

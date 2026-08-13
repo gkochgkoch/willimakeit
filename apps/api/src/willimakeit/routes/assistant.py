@@ -14,6 +14,8 @@ async def assistant_ask(
     body: AssistantRequest,
     request: Request,
 ) -> AssistantResponse:
+    request_id = request.state.request_id
+
     return await run_assistant(
         message=body.message,
         agent=request.app.state.assistant_agent,
