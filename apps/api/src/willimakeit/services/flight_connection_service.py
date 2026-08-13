@@ -52,6 +52,9 @@ class FlightConnectionService:
                 ),
             )
 
+            print(f"inbound {inbound}", flush=True)
+            print(f"outbound {outbound}", flush=True)
+
             if inbound is None:
                 raise FlightConnectionError("inbound flight is not found")
 
@@ -60,6 +63,8 @@ class FlightConnectionService:
 
         except FlightProviderError as exc:
             raise FlightConnectionError(str(exc)) from exc
+
+        print("FC: AFTER FLIGHT LOOKUPS", flush=True)
 
         arrival_airport = self._airport_code(inbound.arrival_airport.iata)
         departure_airport = self._airport_code(outbound.departure_airport.iata)
