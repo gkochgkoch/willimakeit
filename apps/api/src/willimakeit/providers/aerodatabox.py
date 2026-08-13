@@ -1,7 +1,9 @@
 import asyncio
+import json
 from datetime import date
 
 import httpx
+from redis.asyncio import Redis, RedisError
 
 from willimakeit.context import request_id_context
 from willimakeit.providers.aerodatabox_mapper import map_flight_schedule
@@ -15,12 +17,14 @@ class AeroDataBoxFlightProvider:
         api_key: str,
         client: httpx.AsyncClient,
         base_url: str,
+        redis: Redis,
     ) -> None:
         self._api_key = api_key
         self._client = client
         self._base_url = base_url.rstrip("/")
         self._rate_limit_lock = asyncio.Lock()
         self._last_request_at = 0.0
+        self._redis = redis
 
     async def _make_request(self, flight_number: str, flight_date: date):
         """Aerodatabox allowes oonly one request per second"""
@@ -60,9 +64,21 @@ class AeroDataBoxFlightProvider:
         flight_date: date,
     ) -> FlightSchedule | None:
         normalized_flight_number = flight_number.replace(" ", "").upper()
-
+        redis_cache_key = f"flight:{normalized_flight_number}:{flight_date.isoformat()}"
         attempt = 0
         max_attempts = 2
+
+        try:
+            cached = await self._redis.get(redis_cache_key)
+        except RedisError:
+            cached = None
+
+        if cached:
+            payload = json.loads(cached)
+            return map_flight_schedule(
+                payload[0],
+                flight_date=flight_date,
+            )
 
         while attempt < max_attempts:
             try:
@@ -85,6 +101,15 @@ class AeroDataBoxFlightProvider:
 
         if not payload:
             return None
+
+        try:
+            await self._redis.set(
+                redis_cache_key,
+                json.dumps(payload),
+                ex=300,
+            )
+        except RedisError:
+            pass
 
         return map_flight_schedule(
             payload[0],
