@@ -48,9 +48,14 @@ class FlightConnectionTool:
             f"{flight_date=}",
             flush=True,
         )
-
+        parsed_date = date.fromisoformat(flight_date)
+        if parsed_date < date.today():
+            return {
+                "assessed": False,
+                "error": "invalid_flight_date",
+                "message": "Flight date must be today or in the future.",
+            }
         try:
-            parsed_date = date.fromisoformat(flight_date)
             result = await self._service.assess(
                 inbound_flight_number=inbound_flight_number,
                 outbound_flight_number=outbound_flight_number,

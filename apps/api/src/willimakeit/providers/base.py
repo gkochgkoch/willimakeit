@@ -5,10 +5,6 @@ from willimakeit.schemas.flight import FlightSchedule
 from willimakeit.schemas.weather import Weather
 
 
-class FlightNotFoundError(Exception):
-    pass
-
-
 class FlightProvider(Protocol):
     async def find_flight(
         self, flight_number: str, flight_date: date
@@ -23,3 +19,10 @@ class WeatherProvider(Protocol):
         start_date: date,
         end_date: date,
     ) -> Weather: ...
+
+
+class EmbeddingProvider(Protocol):
+    async def embed(
+        self,
+        texts: list[str],
+    ) -> list[list[float]]: ...
