@@ -12,8 +12,10 @@ class Settings(BaseSettings):
     openmeteo_base_url: str = "https://api.open-meteo.com/v1/forecast"
     ollama_base_url: str = "http://localhost:11434/v1/"
     ollama_model: str = "qwen3:4b"
+    ollama_host: str = "localhost:11434"
+    embedding_model: str = "qwen3-embedding:0.6b"
     redis_url: str = "redis://localhost:6379"
-    database_url: str
+    database_url: str = ""
 
     model_config = SettingsConfigDict(
         env_file=API_ROOT / ".env",

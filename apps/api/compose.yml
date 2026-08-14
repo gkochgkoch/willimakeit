@@ -19,7 +19,7 @@ services:
       - "6379:6379"
 
   postgres:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg17
     environment:
       POSTGRES_DB: willimakeit
       POSTGRES_USER: willimakeit
