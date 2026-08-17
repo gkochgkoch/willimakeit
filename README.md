@@ -7,6 +7,12 @@ rules, airport weather, and airline baggage rules.
 The React frontend is a thin client that sends user questions to
 `POST /assistant/ask`.
 
+## Demo Video(click to play on Youtube)
+
+<a href="https://youtu.be/YWkhEfGgag8">
+  <img src="https://img.youtube.com/vi/YWkhEfGgag8/maxresdefault.jpg" width="600" alt="WillIMakeIt demo">
+</a>
+
 ## Architecture
 
 ```mermaid
