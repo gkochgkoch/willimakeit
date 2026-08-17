@@ -24,12 +24,12 @@ class OpenMeteoWeatherProvider:
         self, latitude: float, longitude: float, start_date: date, end_date: date
     ) -> Weather:
         hourly = "visibility,snowfall,wind_speed_80m"
-        params = {
+        params: dict[str, str | float] = {
             "latitude": latitude,
             "longitude": longitude,
             "hourly": hourly,
-            "start_date": start_date,
-            "end_date": end_date,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
         }
 
         try:
