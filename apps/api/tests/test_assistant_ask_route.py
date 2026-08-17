@@ -4,7 +4,10 @@ from willimakeit.main import app
 
 
 class FakeAgentResult:
-    text = "I found flight QR 4818 from Malta International Airport to Paris Charles de Gaulle."
+    text = (
+        "I found flight QR 4818 from Malta International Airport to Paris "
+        "Charles de Gaulle."
+    )
 
 
 class FakeAgent:
