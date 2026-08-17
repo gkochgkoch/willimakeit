@@ -10,6 +10,17 @@ from willimakeit.providers.aerodatabox import AeroDataBoxFlightProvider
 FIXTURES = Path(__file__).parent / "fixtures" / "aerodatabox"
 
 
+class FakeRedis:
+    def __init__(self) -> None:
+        self._data: dict[str, str] = {}
+
+    async def get(self, key: str) -> str | None:
+        return self._data.get(key)
+
+    async def set(self, key: str, value: str, ex: int | None = None) -> None:
+        self._data[key] = value
+
+
 @pytest.mark.asyncio
 async def test_aerodatabox_provider() -> None:
     payload = json.loads((FIXTURES / "scheduled.json").read_text(encoding="utf-8"))
@@ -32,6 +43,7 @@ async def test_aerodatabox_provider() -> None:
             api_key="testttt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         result = await provider.find_flight(
@@ -60,6 +72,7 @@ async def test_aerodatabox_provider_returns_none_for_empty_payload() -> None:
             api_key="testttt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         result = await provider.find_flight(
@@ -82,6 +95,7 @@ async def test_aerodatabox_provider_returns_none_204() -> None:
             api_key="testttt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         result = await provider.find_flight(
@@ -103,6 +117,7 @@ async def test_aerodatabox_provided_returns_none_404() -> None:
             api_key="testttt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         result = await provider.find_flight(
@@ -124,6 +139,7 @@ async def test_aerodatabox_provider_returns_503() -> None:
             api_key="testttt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         with pytest.raises(httpx.HTTPStatusError):
@@ -146,6 +162,7 @@ async def test_aerodatabox_handles_incomplete_response() -> None:
             api_key="testtt",
             client=client,
             base_url="https://aerodatabox.p.rapidapi.com",
+            redis=FakeRedis(),
         )
 
         result = await provider.find_flight(
