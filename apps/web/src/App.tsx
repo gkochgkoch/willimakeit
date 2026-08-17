@@ -5,8 +5,6 @@ import { MessageBubble } from "./MessageBubble";
 
 const API_URL = "http://localhost:8000/assistant/ask";
 
-const EXAMPLES = ["Can I connect from LH123 to AF456 at CDG on 2026-08-15?"];
-
 function SendIcon() {
   return (
     <svg
@@ -174,38 +172,18 @@ export default function App() {
                 rows={1}
                 placeholder="Ask about your flight connection or baggage rules..."
                 autoFocus
-                className="max-h-[240px] w-full resize-none px-2 py-1 text-xl leading-8 text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                disabled={loading}
+                className="max-h-[240px] w-full resize-none px-2 py-1 text-xl leading-8 text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:bg-white disabled:opacity-70"
               />
               <div className="flex items-center gap-1 pt-2">
-                <div className="no-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto">
-                  {showEmptyState &&
-                    EXAMPLES.map((example) => (
-                      <button
-                        key={example}
-                        type="button"
-                        onClick={() => {
-                          setPrompt(example);
-                          requestAnimationFrame(() => {
-                            resizeTextarea();
-                            textareaRef.current?.focus();
-                          });
-                        }}
-                        className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-300/70 bg-white/70 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:border-slate-400 hover:bg-white hover:text-slate-800"
-                      >
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-teal-700">
-                          Example
-                        </span>
-                        {example}
-                      </button>
-                    ))}
-                </div>
                 {prompt.length > 0 && (
                   <button
                     type="button"
                     onClick={clearPrompt}
+                    disabled={loading}
                     title="Clear"
                     aria-label="Clear input"
-                    className="rounded-full p-3 text-slate-400 transition-colors hover:bg-pink-50 hover:text-pink-600"
+                    className="rounded-full p-3 text-slate-400 transition-colors hover:bg-pink-50 hover:text-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <ClearIcon />
                   </button>
