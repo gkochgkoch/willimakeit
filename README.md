@@ -44,8 +44,8 @@ Redis is currently used to cache repeated flight lookup responses.
 Flight connection checking is currently scoped to a limited set of airports and
 seeded transfer rules:
 
-- `CDG`
-- `FRA`
+- `CDG` - Paris Charles de Gaulle Airport
+- `FRA` - Frankfurt Airport
 - `LHR` - London Heathrow
 
 The luggage RAG knowledge base currently contains baggage rules for:
