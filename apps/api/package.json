@@ -4,7 +4,6 @@
   "scripts": {
     "dev": "uv run uvicorn willimakeit.main:app --reload",
     "lint": "uv run ruff check .",
-    "typecheck": "uv run mypy",
-    "test": "uv run pytest"
+    "typecheck": "uv run mypy src"
   }
 }
