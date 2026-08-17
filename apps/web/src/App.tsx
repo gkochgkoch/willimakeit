@@ -5,6 +5,14 @@ import { MessageBubble } from "./MessageBubble";
 
 const API_URL = "http://localhost:8000/assistant/ask";
 
+const EXAMPLE_PROMPT =
+  "Can you check if I have enough time to connect from flight KM478 to flight DL221 on August 24, 2026?";
+
+const WEATHER_EXAMPLE_PROMPT =
+  "What is the weather in Heathrow on August 25, 2026?";
+
+const BAGGAGE_EXAMPLE_PROMPT = "What are the hand luggage rules for Wizz Air?";
+
 function SendIcon() {
   return (
     <svg
@@ -59,11 +67,16 @@ function Spinner() {
 
 function Skeleton() {
   return (
-    <div aria-hidden="true" className="space-y-3.5">
-      <div className="skeleton h-6 w-11/12 rounded-md" />
-      <div className="skeleton h-6 w-full rounded-md" />
-      <div className="skeleton h-6 w-3/4 rounded-md" />
-      <div className="skeleton h-6 w-1/2 rounded-md" />
+    <div aria-hidden="true" className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="skeleton h-8 w-8 rounded-full" />
+        <div className="skeleton h-4 w-52 max-w-[60%] rounded-full" />
+      </div>
+      <div className="pl-11 space-y-3">
+        <div className="skeleton h-4 w-full rounded-full" />
+        <div className="skeleton h-4 w-11/12 rounded-full" />
+        <div className="skeleton h-4 w-3/4 rounded-full" />
+      </div>
     </div>
   );
 }
@@ -83,6 +96,17 @@ export default function App() {
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 240)}px`;
+  }
+
+  function fillExample(prompt: string) {
+    setPrompt(prompt);
+    requestAnimationFrame(() => {
+      const el = textareaRef.current;
+      if (el) {
+        requestAnimationFrame(resizeTextarea);
+        el.focus();
+      }
+    });
   }
 
   function clearPrompt() {
@@ -158,7 +182,7 @@ export default function App() {
       </header>
 
       <main className="flex flex-1 flex-col px-4">
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col">
           <div className="pt-10 sm:pt-12">
             <div className="rounded-2xl border border-white/60 bg-white/80 p-5 shadow-lg shadow-teal-900/5 backdrop-blur-sm focus-within:border-pink-300 focus-within:shadow-pink-200/40">
               <textarea
@@ -170,12 +194,43 @@ export default function App() {
                 }}
                 onKeyDown={handleKeyDown}
                 rows={1}
-                placeholder="Ask about your flight connection or baggage rules..."
+                placeholder="Ask about your flight connection, weather at specific airport or airline baggage rules..."
                 autoFocus
                 disabled={loading}
                 className="max-h-[240px] w-full resize-none px-2 py-1 text-xl leading-8 text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:bg-white disabled:opacity-70"
               />
               <div className="flex items-center gap-1 pt-2">
+                <div className="mr-auto flex min-w-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fillExample(EXAMPLE_PROMPT)}
+                    disabled={loading}
+                    className="min-w-0 cursor-pointer truncate rounded-full border border-pink-200 bg-pink-50/60 px-3 py-1 text-left text-sm text-pink-700 transition-colors hover:bg-pink-100 hover:text-pink-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    title={EXAMPLE_PROMPT}
+                  >
+                    <span className="font-medium">Try:</span> {EXAMPLE_PROMPT}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillExample(WEATHER_EXAMPLE_PROMPT)}
+                    disabled={loading}
+                    className="min-w-0 cursor-pointer truncate rounded-full border border-pink-200 bg-pink-50/60 px-3 py-1 text-left text-sm text-pink-700 transition-colors hover:bg-pink-100 hover:text-pink-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    title={WEATHER_EXAMPLE_PROMPT}
+                  >
+                    <span className="font-medium">Try:</span>{" "}
+                    {WEATHER_EXAMPLE_PROMPT}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillExample(BAGGAGE_EXAMPLE_PROMPT)}
+                    disabled={loading}
+                    className="min-w-0 cursor-pointer truncate rounded-full border border-pink-200 bg-pink-50/60 px-3 py-1 text-left text-sm text-pink-700 transition-colors hover:bg-pink-100 hover:text-pink-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    title={BAGGAGE_EXAMPLE_PROMPT}
+                  >
+                    <span className="font-medium">Try:</span>{" "}
+                    {BAGGAGE_EXAMPLE_PROMPT}
+                  </button>
+                </div>
                 {prompt.length > 0 && (
                   <button
                     type="button"
@@ -203,8 +258,8 @@ export default function App() {
             {showEmptyState && (
               <p className="mt-3 text-center text-sm text-teal-900/70">
                 Ask about a flight connection in your own words — the assistant
-                will check flights, transfers, weather, and airline rules for
-                you.
+                will check flights, transfers, weather, and airline baggage
+                rules for you.
               </p>
             )}
           </div>
